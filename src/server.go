@@ -1,10 +1,11 @@
 package supersocket
 
+
 import (
 	"fmt"
-	"net"
+	//"net"
 )
 
-func startServer() {
-	
+func startServer(config ServerConfig) {
+	fmt.Println("ServerName: ", config.Name);
 }

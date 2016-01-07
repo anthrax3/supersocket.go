@@ -1,42 +1,47 @@
 package main
 
 import (
-	"os"
 	"testing"
-	"fmt"
+    "fmt"
 	"encoding/xml"
+    "../src"
 )
 
-
-type Servers struct {
-    XMLName xml.Name `xml:"servers"`
-    Version string   `xml:"version,attr"`
-    Svs     []server `xml:"server"`
-}
-
-type server struct {
-    ServerName string `xml:"serverName"`
-    ServerIP   string `xml:"serverIP"`
-}
-
 func TestXmlEncode(t *testing.T) {
-	v := &Servers{Version: "1"}
-    v.Svs = append(v.Svs, server{"Shanghai_VPN", "127.0.0.1"})
-    v.Svs = append(v.Svs, server{"Beijing_VPN", "127.0.0.2"})
-    output, err := xml.MarshalIndent(v, "", "    ")
+    s := &supersocket.ServerConfig { Name: "TestServer" }
+    
+    s.Listeners = append(s.Listeners, supersocket.ListenerConfig { Address: "Any:1012" })
+    s.Listeners = append(s.Listeners, supersocket.ListenerConfig { Address: "Any:1013" })
+    
+    output, err := xml.MarshalIndent(s, "", "    ")
     if err != nil {
         t.Fatal(err.Error())
     }
     
-    os.Stdout.Write([]byte(xml.Header))
-    os.Stdout.Write(output)
-	
-	var decodedV Servers
-    err = xml.Unmarshal(output, &decodedV)
-    if err != nil {
-        t.Fatal(err.Error())
-    }
-    
+    fmt.Print(xml.Header)
+    fmt.Print(string(output))
     fmt.Println()
-    fmt.Println("Version: ", decodedV.Version)
+
+	var ds supersocket.ServerConfig
+    err = xml.Unmarshal(output, &ds)
+    
+    if err != nil {
+        t.Fatal(err.Error())
+    }
+    
+    if (ds.Name != "TestServer") {
+        t.Error("Unexpected server name")
+    }
+    
+    if (len(ds.Listeners) != 2) {
+        t.Error("Unexpected listener count")
+    }
+    
+    if (ds.Listeners[0].Address != "Any:1012") {
+        t.Error("Unexpected listener 0 address")
+    }
+    
+    if (ds.Listeners[1].Address != "Any:1013") {
+        t.Error("Unexpected listener 1 address")
+    }
 }
