@@ -8,12 +8,12 @@ import (
 )
 
 func TestXmlEncode(t *testing.T) {
-    s := &supersocket.ServerConfig { Name: "TestServer" }
+    var s = supersocket.ServerConfig { Name: "TestServer" }
     
     s.Listeners = append(s.Listeners, supersocket.ListenerConfig { Address: "Any:1012" })
     s.Listeners = append(s.Listeners, supersocket.ListenerConfig { Address: "Any:1013" })
     
-    output, err := xml.MarshalIndent(s, "", "    ")
+    output, err := xml.MarshalIndent(&s, "", "    ")
     if err != nil {
         t.Fatal(err.Error())
     }
@@ -22,7 +22,7 @@ func TestXmlEncode(t *testing.T) {
     fmt.Print(string(output))
     fmt.Println()
 
-	var ds supersocket.ServerConfig
+    var ds supersocket.ServerConfig
     err = xml.Unmarshal(output, &ds)
     
     if err != nil {
